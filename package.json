@@ -9,6 +9,7 @@
     "lint": "eslint 'src/**/*.{js,ts,json}'",
     "build": "npm run clean && tsc",
     "test": "vows lib/test/test_*.js --spec",
+    "docs": "typedoc src/srp.ts",
     "prepublishOnly": "npm run build",
     "postpublish": "npm run clean"
   },
@@ -33,6 +34,7 @@
     "@types/node": "^10.17.19",
     "typescript": "^3.8.3",
     "vows": "^0.8.3",
+    "typedoc": "next",
     "eslint": "^6.8.0",
     "@typescript-eslint/parser": "^2.27.0",
     "@typescript-eslint/eslint-plugin": "^2.27.0"

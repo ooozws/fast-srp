@@ -106,16 +106,28 @@ export class SRP {
   }
 
 
+  /**
+   * Generate a random key with a length of 32 bytes
+   *
+   * @param {GenKeyCallback} callback
+   * @return {void}
+   */
   public static genKey(callback: GenKeyCallback): void;
-  public static genKey(bytes: number, callback: GenKeyCallback): void;
-  public static genKey(bytes?: number): Promise<Buffer>;
   /**
    * Generate a random key.
    *
-   * @param {number} [bytes=32] Length of key
-   * @param {function} [callback] If not provided a Promise is returned
-   * @return {Promise|void}
+   * @param {number} bytes Length of key
+   * @param {GenKeyCallback} callback
+   * @return {void}
    */
+  public static genKey(bytes: number, callback: GenKeyCallback): void;
+  /**
+   * Generate a random key.
+   *
+   * @param {number} bytes Length of key. Defaults to 32.
+   * @return {Promise<Buffer>}
+   */
+  public static genKey(bytes?: number): Promise<Buffer>;
   public static genKey(bytes: number | GenKeyCallback = 32, callback?: GenKeyCallback): Promise<Buffer> | void {
     // bytes is optional
     if (typeof bytes !== "number") {
@@ -291,14 +303,21 @@ function getK(params: SrpParams, S_buf: Buffer): Buffer {
 
 /**
  *
- * @param params SRP params
- * @param u_buf User identity
- * @param s_buf User salt
- * @param A_buf Client public key
- * @param B_buf Server public key
- * @param K_buf Shared session key
+ * @param {SrpParams} params SRP params
+ * @param {Buffer} u_buf User identity
+ * @param {Buffer} s_buf User salt
+ * @param {Buffer} A_buf Client public key
+ * @param {Buffer} B_buf Server public key
+ * @param {Buffer} K_buf Shared session key
  */
 function getM1(params: SrpParams, u_buf: Buffer, s_buf: Buffer, A_buf: Buffer, B_buf: Buffer, K_buf: Buffer): Buffer
+/**
+ *
+ * @param {SrpParams} params SRP params
+ * @param {Buffer} A_buf Client public key
+ * @param {Buffer} B_buf Server public key
+ * @param {Buffer} K_buf Shared session key
+ */
 function getM1(params: SrpParams,                               A_buf: Buffer, B_buf: Buffer, K_buf: Buffer): Buffer
 function getM1(params: SrpParams, u_buf: Buffer, s_buf: Buffer, A_buf: Buffer, B_buf?: Buffer, K_buf?: Buffer): Buffer {
   if (arguments.length > 4) {
@@ -518,7 +537,7 @@ export class SrpServer {
    * - Using a password: creates the server using a salt, identity and password, optionally in an object
    * - Using a verifier: creates the server using a salt, identity and verifier in an object
    *
-   * @param {object} params Group parameters, with .N, .g, .hash
+   * @param {SrpParams} params Group parameters, with .N, .g, .hash
    * @param {Buffer} salt_buf User salt (from server)
    * @param {Buffer} identity_buf Identity/username
    * @param {Buffer} password_buf Password
