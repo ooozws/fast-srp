@@ -1,10 +1,8 @@
 // @ts-ignore
-import * as vows from 'vows';
-import * as assert from 'assert';
-import * as srp from '..';
-import BigInteger = require('../../lib/jsbn');
-
-delete exports.__esModule;
+import vows from 'vows';
+import assert from 'assert';
+import {SRP, SrpClient, SrpParams, SrpServer} from "../srp";
+import BigInteger = require('../../jsbn/jsbn');
 
 interface Input {
   /** Identity */
@@ -36,7 +34,7 @@ interface ExpectedOutput {
 
 import {N, g, I, p, a, A, b, B, s, v, u, S, K} from './hap_test_data';
 
-const params = srp.params.hap;
+const params = SRP.params.hap;
 
 const inputs: Input = {
   I: Buffer.from(I, 'ascii'),
@@ -77,14 +75,14 @@ function numequal(a: BigInteger, b: BigInteger, msg?: string) {
   assert(a.compareTo(b) === 0, msg);
 }
 
-function checkVectors(params: srp.SrpParams, inputs: Input, expected: ExpectedOutput, useVerifier = true) {
+function checkVectors(params: SrpParams, inputs: Input, expected: ExpectedOutput, useVerifier = true) {
   hexequal(inputs.I, Buffer.from('616c696365', 'hex'), 'I');
-  hexequal(srp.computeVerifier(params, inputs.salt, inputs.I, inputs.P), expected.v, 'v');
+  hexequal(SRP.computeVerifier(params, inputs.salt, inputs.I, inputs.P), expected.v, 'v');
 
-  const client = new srp.Client(params, inputs.salt, inputs.I, inputs.P, inputs.a, true);
+  const client = new SrpClient(params, inputs.salt, inputs.I, inputs.P, inputs.a, true);
   const server = useVerifier ?
-    new srp.Server(params, {username: inputs.I, salt: inputs.salt, verifier: expected.v}, inputs.b) :
-    new srp.Server(params, inputs.salt, inputs.I, inputs.P, inputs.b);
+    new SrpServer(params, {username: inputs.I, salt: inputs.salt, verifier: expected.v}, inputs.b) :
+    new SrpServer(params, inputs.salt, inputs.I, inputs.P, inputs.b);
 
   // @ts-ignore
   numequal(client._k, new BigInteger(expected.k.toString('hex'), 16), 'k');

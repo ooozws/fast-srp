@@ -9,7 +9,7 @@ Creating the Verifier
 ---
 
 ```ts
-import * as srp6a from 'fast-srp-hap';
+import { SRP } from 'fast-srp-hap';
 
 /**
  * Computes the verifier of a user. Only needed to add the user to the auth system.
@@ -19,12 +19,12 @@ import * as srp6a from 'fast-srp-hap';
  * @return {Promise<{salt: Buffer, verifier: Buffer}>}
  */
 async function srp6a_create_user(I: string, P: string) {
-  const salt = await srp6a.genKey(32);
+  const salt = await SRP.genKey(32);
   
   return {
     // The salt is required for authenticating the user later
     salt,
-    verifier: srp6a.computeVerifier(srp6a.params[4096], salt, Buffer.from(I), Buffer.from(P)),
+    verifier: SRP.computeVerifier(SRP.params[4096], salt, Buffer.from(I), Buffer.from(P)),
   };
 }
 
@@ -38,7 +38,7 @@ Server
 ---
 
 ```ts
-import {Server, genKey, params} from 'fast-srp-hap';
+import {SRP, SrpServer} from 'fast-srp-hap';
 
 (async () => {
   // Get the user details from somewhere
@@ -46,7 +46,7 @@ import {Server, genKey, params} from 'fast-srp-hap';
     username: 'username', // Or a Buffer
 
     // If we have the plaintext password
-    salt: await genKey(32),
+    salt: await SRP.genKey(32),
     password: 'password', // Or a Buffer
     
     // If we have a saved verifier
@@ -55,9 +55,9 @@ import {Server, genKey, params} from 'fast-srp-hap';
   };
 
   // Generate a secret key
-  const secret = await genKey(32);
+  const secret = await SRP.genKey(32);
 
-  const server = new Server(params[3076], user, secret); // For Apple SRP use params.hap
+  const server = new SrpServer(SRP.params[3076], user, secret); // For Apple SRP use params.hap
 
   // ...
 })();

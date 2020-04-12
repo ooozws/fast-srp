@@ -1,5 +1,4 @@
-import {hex} from '../lib/params';
-import BigInteger = require('../../lib/jsbn');
+import {hex} from '../params';
 
 // Modulus (N), as specified by the 3072-bit group of RFC 5054
 export const N = hex(`

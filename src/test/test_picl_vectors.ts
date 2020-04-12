@@ -1,10 +1,8 @@
 // @ts-ignore
-import * as vows from 'vows';
-import * as assert from 'assert';
-import * as srp from '..';
-import BigInteger = require('../../lib/jsbn');
-
-delete exports.__esModule;
+import vows from 'vows';
+import assert from 'assert';
+import {SRP, SrpClient, SrpParams, SrpServer} from '../srp';
+import BigInteger = require('../../jsbn/jsbn');
 
 /*
  * Vectors from https://wiki.mozilla.org/Identity/AttachedServices/KeyServerProtocol
@@ -19,7 +17,7 @@ function hex(s: string) {
   return Buffer.from(s.split(/\s/).join(''), 'hex');
 }
 
-const params = srp.params[2048];
+const params = SRP.params[2048];
 
 interface Input {
   /** Identity */
@@ -318,12 +316,12 @@ function numequal(a: BigInteger, b: BigInteger, msg?: string) {
   assert(a.compareTo(b) === 0, msg);
 }
 
-function checkVectors(params: srp.SrpParams, inputs: Input, expected: ExpectedOutput) {
+function checkVectors(params: SrpParams, inputs: Input, expected: ExpectedOutput) {
   hexequal(inputs.I, Buffer.from('616e6472c3a9406578616d706c652e6f7267', 'hex'), 'I');
-  hexequal(srp.computeVerifier(params, inputs.salt, inputs.I, inputs.P), expected.v, 'v');
+  hexequal(SRP.computeVerifier(params, inputs.salt, inputs.I, inputs.P), expected.v, 'v');
 
-  const client = new srp.Client(params, inputs.salt, inputs.I, inputs.P, inputs.a, false);
-  const server = new srp.Server(params, expected.v, inputs.b);
+  const client = new SrpClient(params, inputs.salt, inputs.I, inputs.P, inputs.a, false);
+  const server = new SrpServer(params, expected.v, inputs.b);
 
   // @ts-ignore
   numequal(client._k, new BigInteger(expected.k.toString('hex'), 16), 'k');

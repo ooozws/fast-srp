@@ -1,10 +1,11 @@
-import * as crypto from 'crypto';
-import * as assert from 'assert';
-import BigInteger = require('../../lib/jsbn');
+import crypto from 'crypto';
+import assert from 'assert';
+import BigInteger = require('../jsbn/jsbn');
+import {SrpParams, params as srpParams} from './params';
 
-import {SrpParams} from './params';
+export { SrpParams } from './params';
 
-var zero = new BigInteger(0, 10);
+const zero = new BigInteger(0, 10);
 
 function assert_(val: any, msg: string) {
   if (!val)
@@ -34,7 +35,7 @@ function padTo(n: Buffer, len: number) {
 
 function padToN(number: BigInteger, params: SrpParams) {
   assertIsBigInteger(number);
-  var n = number.toString(16).length % 2 != 0 ? '0' + number.toString(16) : number.toString(16);
+  const n = number.toString(16).length % 2 != 0 ? '0' + number.toString(16) : number.toString(16);
   return padTo(Buffer.from(n, 'hex'), params.N_length_bits / 8);
 }
 
@@ -66,35 +67,68 @@ function getx(params: SrpParams, salt: Buffer, I: Buffer, P: Buffer) {
   const hashIP = crypto.createHash(params.hash)
     .update(Buffer.concat([I, Buffer.from(':'), P]))
     .digest();
-  const hashX = crypto.createHash(params.hash)
+  const hashX: Buffer = crypto.createHash(params.hash)
     .update(salt)
     .update(hashIP)
     .digest();
   return new BigInteger(hashX);
 }
 
-/**
- * The verifier is calculated as described in Section 3 of [SRP-RFC].
- * We give the algorithm here for convenience.
- *
- * The verifier (v) is computed based on the salt (s), user name (I),
- * password (P), and group parameters (N, g).
- *
- *         x = H(s | H(I | ":" | P))
- *         v = g^x % N
- *
- * @param {object} params Group parameters, with .N, .g, .hash
- * @param {Buffer} salt
- * @param {Buffer} I User identity
- * @param {Buffer} P User password
- * @return {Buffer}
- */
-export function computeVerifier(params: SrpParams, salt: Buffer, I: Buffer, P: Buffer) {
-  assertIsBuffer(salt, 'salt (salt)');
-  assertIsBuffer(I, 'identity (I)');
-  assertIsBuffer(P, 'password (P)');
-  var v_num = params.g.modPow(getx(params, salt, I, P), params.N);
-  return v_num.toBuffer(params.N_length_bits / 8);
+export type GenKeyCallback = (err: Error | null, data: Buffer | null) => void;
+
+export class SRP {
+
+  public static readonly params = srpParams;
+
+  /**
+   * The verifier is calculated as described in Section 3 of [SRP-RFC].
+   * We give the algorithm here for convenience.
+   *
+   * The verifier (v) is computed based on the salt (s), user name (I),
+   * password (P), and group parameters (N, g).
+   *
+   *         x = H(s | H(I | ":" | P))
+   *         v = g^x % N
+   *
+   * @param {object} params Group parameters, with .N, .g, .hash
+   * @param {Buffer} salt
+   * @param {Buffer} I User identity
+   * @param {Buffer} P User password
+   * @return {Buffer}
+   */
+  public static computeVerifier(params: SrpParams, salt: Buffer, I: Buffer, P: Buffer): Buffer {
+    assertIsBuffer(salt, 'salt (salt)');
+    assertIsBuffer(I, 'identity (I)');
+    assertIsBuffer(P, 'password (P)');
+    const v_num = params.g.modPow(getx(params, salt, I, P), params.N);
+    return v_num.toBuffer(params.N_length_bits / 8);
+  }
+
+  /**
+   * Generate a random key.
+   *
+   * @param {number} [bytes=32] Length of key
+   * @param {function} [callback] If not provided a Promise is returned
+   * @return {Promise|void}
+   */
+  public static genKey(callback: GenKeyCallback): void;
+  public static genKey(bytes: number, callback: GenKeyCallback): void;
+  public static genKey(bytes?: number): Promise<Buffer>;
+  public static genKey(bytes: number | GenKeyCallback = 32, callback?: GenKeyCallback): Promise<Buffer> | void {
+    // bytes is optional
+    if (typeof bytes !== 'number') {
+      callback = bytes as unknown as GenKeyCallback;
+      bytes = 32;
+    }
+
+    if (!callback) return new Promise((rs, rj) => SRP.genKey(bytes as number, (err, data) => err ? rj(err) : rs(data!)));
+
+    crypto.randomBytes(bytes, (err, buf) => {
+      if (err) return callback!(err, null);
+      return callback!(null, buf);
+    });
+  }
+
 }
 
 /**
@@ -114,32 +148,6 @@ function getk(params: SrpParams) {
 }
 
 /**
- * Generate a random key.
- *
- * @param {number} [bytes=32] Length of key
- * @param {function} [callback] If not provided a Promise is returned
- * @return {Promise|void}
- */
-type GenKeyCallback = (err: Error | null, data: Buffer | null) => void;
-export function genKey(callback: GenKeyCallback): void
-export function genKey(bytes: number, callback: GenKeyCallback): void
-export function genKey(bytes?: number): Promise<Buffer>
-export function genKey(bytes: number | GenKeyCallback = 32, callback?: GenKeyCallback): Promise<Buffer> | void {
-  // bytes is optional
-  if (typeof bytes !== 'number') {
-    callback = bytes as unknown as GenKeyCallback;
-    bytes = 32;
-  }
-
-  if (!callback) return new Promise((rs, rj) => genKey(bytes as number, (err, data) => err ? rj(err) : rs(data!)));
-
-  crypto.randomBytes(bytes, (err, buf) => {
-    if (err) return callback!(err, null);
-    return callback!(null, buf);
-  });
-}
-
-/**
  * The server key exchange message also contains the server's public
  * value (B).  The server calculates this value as B = k*v + g^b % N,
  * where b is a random number that SHOULD be at least 256 bits in length
@@ -147,7 +155,8 @@ export function genKey(bytes: number | GenKeyCallback = 32, callback?: GenKeyCal
  *
  * Note: as the tests imply, the entire expression is mod N.
  *
- * @param {object} params Group parameters, with .N, .g, .hash
+ * @param {SrpParams} params Group parameters, with .N, .g, .hash
+ * @param {BigInteger} k
  * @param {BigInteger} v Verifier (stored)
  * @param {BigInteger} b Server secret exponent
  * @return {Buffer} B - The server public message
@@ -168,7 +177,7 @@ function getB(params: SrpParams, k: BigInteger, v: BigInteger, b: BigInteger) {
  * Note: for this implementation, we take that to mean 256/8 bytes.
  *
  * @param {object} params Group parameters, with .N, .g, .hash
- * @param {BigInteger} a Client secret exponent
+ * @param {BigInteger} a_num Client secret exponent
  * @return {BigInteger} A - The client public message
  */
 function getA(params: SrpParams, a_num: BigInteger) {
@@ -231,10 +240,10 @@ function client_getS(params: SrpParams, k_num: BigInteger, x_num: BigInteger, a_
  * The TLS premastersecret as calculated by the server
  *
  * @param {BigInteger} params Group parameters, with .N, .g, .hash
- * @param {BigInteger} v Verifier (stored on server)
- * @param {BigInteger} A Ephemeral client public key (read from client)
- * @param {BigInteger} b Server ephemeral private key (generated for session)
- * @param {BigInteger} u {@see getu}
+ * @param {BigInteger} v_num Verifier (stored on server)
+ * @param {BigInteger} A_num Ephemeral client public key (read from client)
+ * @param {BigInteger} b_num Server ephemeral private key (generated for session)
+ * @param {BigInteger} u_num {@see getu}
  * @return {Buffer}
  */
 function server_getS(params: SrpParams, v_num: BigInteger, A_num: BigInteger, b_num: BigInteger, u_num: BigInteger) {
@@ -255,7 +264,7 @@ function server_getS(params: SrpParams, v_num: BigInteger, A_num: BigInteger, b_
  * Compute the shared session key K from S
  *
  * @param {object} params Group parameters, with .N, .g, .hash
- * @param {Buffer} S Session key
+ * @param {Buffer} S_buf Session key
  * @return {Buffer}
  */
 function getK(params: SrpParams, S_buf: Buffer) {
@@ -273,7 +282,7 @@ function getK(params: SrpParams, S_buf: Buffer) {
 }
 
 /**
- * 
+ *
  * @param params SRP params
  * @param u_buf User identity
  * @param s_buf User salt
@@ -291,13 +300,13 @@ function getM1(params: SrpParams, u_buf: Buffer, s_buf: Buffer, A_buf: Buffer, B
     assertIsBuffer(B_buf!, 'server public key (B)');
     assertIsBuffer(K_buf!, 'session key (K)');
 
-    var hN = crypto.createHash(params.hash).update(params.N.toBuffer(true)).digest();
-    var hG = crypto.createHash(params.hash).update(params.g.toBuffer(true)).digest();
+    const hN = crypto.createHash(params.hash).update(params.N.toBuffer(true)).digest();
+    const hG = crypto.createHash(params.hash).update(params.g.toBuffer(true)).digest();
 
-    for (var i = 0; i < hN.length; i++)
+    for (let i = 0; i < hN.length; i++)
       hN[i] ^= hG[i];
 
-    var hU = crypto.createHash(params.hash).update(u_buf).digest();
+    const hU = crypto.createHash(params.hash).update(u_buf).digest();
 
     return crypto.createHash(params.hash)
       .update(hN).update(hU).update(s_buf)
@@ -332,19 +341,19 @@ function equal(buf1: Buffer, buf2: Buffer) {
   return buf1.toString('hex') === buf2.toString('hex');
 }
 
-export class Client {
-  private _params: SrpParams;
-  private _k: BigInteger;
-  private _x: BigInteger;
+export class SrpClient {
+  private readonly _params: SrpParams;
+  private readonly _k: BigInteger;
+  private readonly _x: BigInteger;
   /** Client private key */
-  private _a: BigInteger;
+  private readonly _a: BigInteger;
   /** Client public key */
-  private _A: Buffer;
+  private readonly _A: Buffer;
 
   /** User identity */
-  private _I?: Buffer;
+  private readonly _I?: Buffer;
   /** User salt */
-  private _s?: Buffer;
+  private readonly _s?: Buffer;
 
   /** Session key */
   private _K?: Buffer;
@@ -386,7 +395,7 @@ export class Client {
 
     this._A = getA(params, this._a);
   }
-  
+
   /**
    * Returns the client's public key (A).
    *
@@ -395,7 +404,7 @@ export class Client {
   computeA() {
     return this._A;
   }
-  
+
   /**
    * Sets the server's public key (B).
    *
@@ -462,21 +471,21 @@ export type VerifierIdentity = BaseIdentity & {verifier: Buffer};
 
 export type Identity = PasswordIdentity | VerifierIdentity;
 
-export class Server {
-  private _params: SrpParams;
+export class SrpServer {
+  private readonly _params: SrpParams;
   /** Multiplier parameter (H(N, g)) */
-  private _k: BigInteger;
+  private readonly _k: BigInteger;
   /** Server private key */
-  private _b: BigInteger;
+  private readonly _b: BigInteger;
   /** Server public key */
-  private _B: Buffer;
+  private readonly _B: Buffer;
   /** Verifier */
-  private _v: BigInteger;
+  private readonly _v: BigInteger;
 
   /** User identity */
-  private _I?: Buffer;
+  private readonly _I?: Buffer;
   /** User salt */
-  private _s?: Buffer;
+  private readonly _s?: Buffer;
 
   /** Session key */
   _K?: Buffer;
@@ -500,7 +509,7 @@ export class Server {
    * @param {Buffer} salt_buf User salt (from server)
    * @param {Buffer} identity_buf Identity/username
    * @param {Buffer} password_buf Password
-   * @param {Buffer} secret1_buf Client private key {@see genKey}
+   * @param {Buffer} secret2_buf Client private key {@see genKey}
    */
   constructor(params: SrpParams, salt_buf: Buffer, identity_buf: Buffer, password_buf: Buffer, secret2_buf: Buffer)
   constructor(params: SrpParams, verifier_buf: Buffer, secret2_buf: Buffer)
@@ -516,7 +525,7 @@ export class Server {
       assertIsBuffer(secret2_buf!, 'secret2');
 
       this._b = new BigInteger(secret2_buf!);
-      this._v = new BigInteger(computeVerifier(params, salt_buf as Buffer, identity_buf!, password_buf!));
+      this._v = new BigInteger(SRP.computeVerifier(params, salt_buf as Buffer, identity_buf!, password_buf!));
 
       this._I = identity_buf;
       this._s = salt_buf as Buffer;
@@ -533,6 +542,7 @@ export class Server {
       const identity = salt_buf as Identity;
       [secret2_buf, salt_buf, identity_buf, password_buf] = [identity_buf, undefined, undefined, undefined];
 
+      // noinspection SuspiciousTypeOfGuard
       assert(identity.username instanceof Buffer || typeof identity.username === 'string', 'identity.username (I) must be a string or Buffer');
       assertIsBuffer(identity.salt, 'identity.salt (s)');
       assert('password' in identity || 'verifier' in identity, 'identity requires a password or verifier');
@@ -546,7 +556,7 @@ export class Server {
       if ('verifier' in identity) {
         this._v = new BigInteger(identity.verifier);
       } else {
-        this._v = new BigInteger(computeVerifier(
+        this._v = new BigInteger(SRP.computeVerifier(
           params, identity.salt, username,
           typeof identity.password === 'string' ? Buffer.from(identity.password) : identity.password
         ));

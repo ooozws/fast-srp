@@ -1,12 +1,10 @@
 // @ts-ignore
-import * as vows from 'vows';
-import * as assert from 'assert';
-import * as srp from '..';
-import BigInteger = require('../../lib/jsbn');
+import vows from 'vows';
+import assert from 'assert';
+import {SRP, SrpClient, SrpServer} from '../srp';
+import BigInteger = require('../../jsbn/jsbn');
 
-delete exports.__esModule;
-
-const params = srp.params[1024];
+const params = SRP.params[1024];
 
 /*
  * http://tools.ietf.org/html/rfc5054#appendix-B
@@ -60,11 +58,11 @@ function asHex(num: number | BigInteger) {
 vows.describe('RFC 5054').addBatch({
   'Test vectors': {
     topic() {
-      return srp.computeVerifier(params, s, I, P);
+      return SRP.computeVerifier(params, s, I, P);
     },
 
     'x'() {
-      const client = new srp.Client(params, s, I, P, a, false);
+      const client = new SrpClient(params, s, I, P, a, false);
       // @ts-ignore
       assert.equal(asHex(client._x), x_expected);
     },
@@ -74,37 +72,37 @@ vows.describe('RFC 5054').addBatch({
     },
 
     'k'() {
-      const client = new srp.Client(params, s, I, P, a, false);
+      const client = new SrpClient(params, s, I, P, a, false);
       // @ts-ignore
       assert.equal(asHex(client._k), k_expected);
     },
 
     'A'() {
-      const client = new srp.Client(params, s, I, P, a, false);
+      const client = new SrpClient(params, s, I, P, a, false);
       assert.equal(client.computeA().toString('hex'), A_expected);
     },
 
     'B'(v: Buffer) {
-      const server = new srp.Server(params, v, b);
+      const server = new SrpServer(params, v, b);
       assert.equal(server.computeB().toString('hex'), B_expected);
     },
 
     'u'() {
-      const client = new srp.Client(params, s, I, P, a, false);
+      const client = new SrpClient(params, s, I, P, a, false);
       client.setB(Buffer.from(B_expected, 'hex'));
       // @ts-ignore
       assert.equal(asHex(client._u), u_expected);
     },
 
     'S client'() {
-      const client = new srp.Client(params, s, I, P, a, false);
+      const client = new SrpClient(params, s, I, P, a, false);
       client.setB(Buffer.from(B_expected, 'hex'));
       // @ts-ignore
       assert.equal(client._S.toString('hex'), S_expected);
     },
 
     'S server'(v: Buffer) {
-      const server = new srp.Server(params, v, b);
+      const server = new SrpServer(params, v, b);
       server.setA(Buffer.from(A_expected, 'hex'));
       // @ts-ignore
       assert.equal(server._S.toString('hex'), S_expected);

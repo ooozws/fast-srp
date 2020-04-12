@@ -2,26 +2,34 @@
   "name": "fast-srp-hap",
   "description": "Secure Remote Password (SRP)",
   "version": "1.1.0",
-  "main": "dist/index.js",
+  "main": "lib/srp.js",
   "scripts": {
-    "prepare": "rm -rf dist && tsc",
-    "test": "vows dist/test/test_*.js --spec"
+    "clean": "rm -rf lib",
+    "build": "npm run clean && tsc",
+    "prepublishOnly": "npm run build",
+    "postpublish": "npm run clean",
+    "test": "vows lib/test/test_*.js --spec"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/zarmack/fast-srp"
+    "url": "https://github.com/homebridge/fast-srp-hap"
   },
   "author": "Zarmack Tanen",
-  "licence": "MIT",
+  "license": "MIT",
+  "engines": {
+    "node": ">=10.17.0"
+  },
   "files": [
+    "jsbn",
     "lib",
-    "dist/index.*",
-    "dist/lib"
+    "!lib/test",
+    "README.md",
+    "LICENSE"
   ],
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "^12.12.3",
-    "typescript": "^3.6.4",
+    "@types/node": "^10.17.19",
+    "typescript": "^3.8.3",
     "vows": "^0.8.3"
   }
 }

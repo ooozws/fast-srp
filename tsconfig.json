@@ -1,12 +1,22 @@
 {
     "compilerOptions": {
-        "strict": true,
+        "target": "ES2018",
+        "module": "commonjs",
+        "lib": [
+            "es2015",
+            "es2016",
+            "es2017",
+            "es2018"
+        ],
         "declaration": true,
+        "declarationMap": true,
         "sourceMap": true,
+        "outDir": "lib",
         "rootDir": "src",
-        "outDir": "dist"
+        "strict": true,
+        "esModuleInterop": true
     },
     "include": [
-        "src/**/*"
+        "src/"
     ]
 }

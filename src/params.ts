@@ -14,7 +14,7 @@
 // since these are meant to be used internally, all values are numbers. If
 // you want to add parameter sets, you'll need to convert them to bignums.
 
-import BigInteger = require('../../lib/jsbn');
+import BigInteger = require('../jsbn/jsbn');
 
 export function hex(s: string) {
     return new BigInteger(s.split(/\s|\n/).join(''), 16);
@@ -27,9 +27,7 @@ export interface SrpParams {
   hash: string;
 }
 
-const params: {
-  [n: string]: SrpParams;
-} = {
+export const params = {
   1024: {
     N_length_bits: 1024,
     N: hex(`
