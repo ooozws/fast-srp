@@ -1,7 +1,7 @@
 {
   "name": "fast-srp-hap",
   "description": "Secure Remote Password (SRP)",
-  "version": "1.0.3",
+  "version": "1.2.0",
   "main": "index.js",
   "scripts": {
     "test": "vows test/test_*.js --spec"
