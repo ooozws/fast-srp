@@ -3,6 +3,7 @@
   "description": "Secure Remote Password (SRP)",
   "version": "2.0.0",
   "main": "lib/srp.js",
+  "types": "lib/srp.d.ts",
   "scripts": {
     "clean": "rm -rf lib",
     "lint": "eslint 'src/**/*.{js,ts,json}'",
