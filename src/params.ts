@@ -14,10 +14,10 @@
 // since these are meant to be used internally, all values are numbers. If
 // you want to add parameter sets, you'll need to convert them to bignums.
 
-import BigInteger = require('../jsbn/jsbn');
+import BigInteger = require("../jsbn/jsbn");
 
-export function hex(s: string) {
-    return new BigInteger(s.split(/\s|\n/).join(''), 16);
+export function hex(s: string): BigInteger {
+  return new BigInteger(s.split(/\s|\n/).join(""), 16);
 }
 
 export interface SrpParams {
@@ -37,8 +37,8 @@ export const params = {
       7BCF1885 C529F566 660E57EC 68EDBC3C 05726CC0 2FD4CBF4 976EAA9A
       FD5138FE 8376435B 9FC61D2F C0EB06E3
     `),
-    g: hex('02'),
-    hash: 'sha1',
+    g: hex("02"),
+    hash: "sha1",
   },
 
   1536: {
@@ -52,8 +52,8 @@ export const params = {
       F7CCB7AE 837C264A E3A9BEB8 7F8A2FE9 B8B5292E 5A021FFF 5E91479E
       8CE7A28C 2442C6F3 15180F93 499A234D CF76E3FE D135F9BB
     `),
-    g: hex('02'),
-    hash: 'sha1',
+    g: hex("02"),
+    hash: "sha1",
   },
 
   2048: {
@@ -70,8 +70,8 @@ export const params = {
       94B5C803 D89F7AE4 35DE236D 525F5475 9B65E372 FCD68EF2 0FA7111F
       9E4AFF73
     `),
-    g: hex('02'),
-    hash: 'sha256',
+    g: hex("02"),
+    hash: "sha256",
   },
 
   3072: {
@@ -92,8 +92,8 @@ export const params = {
       BBE11757 7A615D6C 770988C0 BAD946E2 08E24FA0 74E5AB31 43DB5BFC
       E0FD108E 4B82D120 A93AD2CA FFFFFFFF FFFFFFFF
     `),
-    g: hex('05'),
-    hash: 'sha256',
+    g: hex("05"),
+    hash: "sha256",
   },
 
   hap: {
@@ -114,8 +114,8 @@ export const params = {
       BBE11757 7A615D6C 770988C0 BAD946E2 08E24FA0 74E5AB31 43DB5BFC
       E0FD108E 4B82D120 A93AD2CA FFFFFFFF FFFFFFFF
     `),
-    g: hex('05'),
-    hash: 'sha512',
+    g: hex("05"),
+    hash: "sha512",
   },
 
   4096: {
@@ -141,8 +141,8 @@ export const params = {
       D5B05AA9 93B4EA98 8D8FDDC1 86FFB7DC 90A6C08F 4DF435C9 34063199
       FFFFFFFF FFFFFFFF
     `),
-    g: hex('05'),
-    hash: 'sha256',
+    g: hex("05"),
+    hash: "sha256",
   },
 
   6244: {
@@ -177,8 +177,8 @@ export const params = {
       387FE8D7 6E3C0468 043E8F66 3F4860EE 12BF2D5B 0B7474D6 E694F91E
       6DCC4024 FFFFFFFF FFFFFFFF
     `),
-    g: hex('05'),
-    hash: 'sha256',
+    g: hex("05"),
+    hash: "sha256",
   },
 
   8192: {
@@ -222,8 +222,8 @@ export const params = {
       FC026E47 9558E447 5677E9AA 9E3050E2 765694DF C81F56E8 80B96E71
       60C980DD 98EDD3DF FFFFFFFF FFFFFFFF
     `),
-    g: hex('13'),
-    hash: 'sha256',
+    g: hex("13"),
+    hash: "sha256",
   },
 };
 

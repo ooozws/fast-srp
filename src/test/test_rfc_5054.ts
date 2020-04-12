@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 // @ts-ignore
-import vows from 'vows';
-import assert from 'assert';
-import {SRP, SrpClient, SrpServer} from '../srp';
-import BigInteger = require('../../jsbn/jsbn');
+import vows from "vows";
+import assert from "assert";
+import { SRP, SrpClient, SrpServer } from "../srp";
+import BigInteger = require("../../jsbn/jsbn");
 
 const params = SRP.params[1024];
 
@@ -10,15 +11,15 @@ const params = SRP.params[1024];
  * http://tools.ietf.org/html/rfc5054#appendix-B
  */
 
-function hex(h: string) {
-  return h.split(/\s/).join('');
+function hex(h: string): string {
+  return h.split(/\s/).join("");
 }
 
-const I = Buffer.from('alice');
-const P = Buffer.from('password123');
-const s = Buffer.from('beb25379d1a8581eb5a727673a2441ee', 'hex');
-const k_expected = '7556aa045aef2cdd07abaf0f665c3e818913186f';
-const x_expected = '94b7555aabe9127cc58ccf4993db6cf84d16c124';
+const I = Buffer.from("alice");
+const P = Buffer.from("password123");
+const s = Buffer.from("beb25379d1a8581eb5a727673a2441ee", "hex");
+const k_expected = "7556aa045aef2cdd07abaf0f665c3e818913186f";
+const x_expected = "94b7555aabe9127cc58ccf4993db6cf84d16c124";
 const v_expected = hex(`
   7e273de8 696ffc4f 4e337d05 b4b375be b0dde156 9e8fa00a 9886d812
   9bada1f1 822223ca 1a605b53 0e379ba4 729fdc59 f105b478 7e5186f5
@@ -26,8 +27,8 @@ const v_expected = hex(`
   ea53d15c 1aff87b2 b9da6e04 e058ad51 cc72bfc9 033b564e 26480d78
   e955a5e2 9e7ab245 db2be315 e2099afb
 `);
-const a = Buffer.from('60975527035cf2ad1989806f0407210bc81edc04e2762a56afd529ddda2d4393', 'hex');
-const b = Buffer.from('e487cb59d31ac550471e81f00f6928e01dda08e974a004f49e61f5d105284d20', 'hex');
+const a = Buffer.from("60975527035cf2ad1989806f0407210bc81edc04e2762a56afd529ddda2d4393", "hex");
+const b = Buffer.from("e487cb59d31ac550471e81f00f6928e01dda08e974a004f49e61f5d105284d20", "hex");
 const A_expected = hex(`
   61d5e490 f6f1b795 47b0704c 436f523d d0e560f0 c64115bb 72557ec4
   4352e890 3211c046 92272d8b 2d1a5358 a2cf1b6e 0bfcf99f 921530ec
@@ -42,7 +43,7 @@ const B_expected = hex(`
   37089e6f 9c6059f3 88838e7a 00030b33 1eb76840 910440b1 b27aaeae
   eb4012b7 d7665238 a8e3fb00 4b117b58
 `);
-const u_expected = 'ce38b9593487da98554ed47d70a7ae5f462ef019';
+const u_expected = "ce38b9593487da98554ed47d70a7ae5f462ef019";
 const S_expected = hex(`
   b0dc82ba bcf30674 ae450c02 87745e79 90a3381f 63b387aa f271a10d
   233861e3 59b48220 f7c4693c 9ae12b0a 6f67809f 0876e2d0 13800d6c
@@ -51,61 +52,61 @@ const S_expected = hex(`
   c346d7e4 74b29ede 8a469ffe ca686e5a
 `);
 
-function asHex(num: number | BigInteger) {
+function asHex(num: number | BigInteger): string {
   return num.toString(16);
 }
 
-vows.describe('RFC 5054').addBatch({
-  'Test vectors': {
-    topic() {
+vows.describe("RFC 5054").addBatch({
+  "Test vectors": {
+    topic(): Buffer {
       return SRP.computeVerifier(params, s, I, P);
     },
 
-    'x'() {
+    "x"(): void {
       const client = new SrpClient(params, s, I, P, a, false);
       // @ts-ignore
-      assert.equal(asHex(client._x), x_expected);
+      assert.strictEqual(asHex(client._x), x_expected);
     },
 
-    'V'(v: Buffer) {
-      assert.equal(v.toString('hex'), v_expected);
+    "V"(v: Buffer): void {
+      assert.strictEqual(v.toString("hex"), v_expected);
     },
 
-    'k'() {
+    "k"(): void {
       const client = new SrpClient(params, s, I, P, a, false);
       // @ts-ignore
-      assert.equal(asHex(client._k), k_expected);
+      assert.strictEqual(asHex(client._k), k_expected);
     },
 
-    'A'() {
+    "A"(): void {
       const client = new SrpClient(params, s, I, P, a, false);
-      assert.equal(client.computeA().toString('hex'), A_expected);
+      assert.strictEqual(client.computeA().toString("hex"), A_expected);
     },
 
-    'B'(v: Buffer) {
+    "B"(v: Buffer): void {
       const server = new SrpServer(params, v, b);
-      assert.equal(server.computeB().toString('hex'), B_expected);
+      assert.strictEqual(server.computeB().toString("hex"), B_expected);
     },
 
-    'u'() {
+    "u"(): void {
       const client = new SrpClient(params, s, I, P, a, false);
-      client.setB(Buffer.from(B_expected, 'hex'));
+      client.setB(Buffer.from(B_expected, "hex"));
       // @ts-ignore
-      assert.equal(asHex(client._u), u_expected);
+      assert.strictEqual(asHex(client._u), u_expected);
     },
 
-    'S client'() {
+    "S client"(): void {
       const client = new SrpClient(params, s, I, P, a, false);
-      client.setB(Buffer.from(B_expected, 'hex'));
+      client.setB(Buffer.from(B_expected, "hex"));
       // @ts-ignore
-      assert.equal(client._S.toString('hex'), S_expected);
+      assert.strictEqual(client._S.toString("hex"), S_expected);
     },
 
-    'S server'(v: Buffer) {
+    "S server"(v: Buffer): void {
       const server = new SrpServer(params, v, b);
-      server.setA(Buffer.from(A_expected, 'hex'));
+      server.setA(Buffer.from(A_expected, "hex"));
       // @ts-ignore
-      assert.equal(server._S.toString('hex'), S_expected);
+      assert.strictEqual(server._S.toString("hex"), S_expected);
     },
   },
 }).export(module);

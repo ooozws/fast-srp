@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 // @ts-ignore
-import vows from 'vows';
-import assert from 'assert';
-import {SRP, SrpClient, SrpParams, SrpServer} from '../srp';
-import BigInteger = require('../../jsbn/jsbn');
+import vows from "vows";
+import assert from "assert";
+import { SRP, SrpClient, SrpParams, SrpServer } from "../srp";
+import BigInteger = require("../../jsbn/jsbn");
 
 /*
  * Vectors from https://wiki.mozilla.org/Identity/AttachedServices/KeyServerProtocol
@@ -13,8 +14,8 @@ import BigInteger = require('../../jsbn/jsbn');
  * Note that P is the HKDF-stretched key, computed elsewhere.
  */
 
-function hex(s: string) {
-  return Buffer.from(s.split(/\s/).join(''), 'hex');
+function hex(s: string): Buffer {
+  return Buffer.from(s.split(/\s/).join(""), "hex");
 }
 
 const params = SRP.params[2048];
@@ -53,9 +54,9 @@ interface ExpectedOutput {
  */
 
 const inputs_1: Input = {
-  I: Buffer.from('andré@example.org', 'utf8'),
-  P: hex('00f9b71800ab5337 d51177d8fbc682a3 653fa6dae5b87628 eeec43a18af59a9d'),
-  salt: hex('00f1000000000000000000000000000000000000000000000000000000000179'),
+  I: Buffer.from("andré@example.org", "utf8"),
+  P: hex("00f9b71800ab5337 d51177d8fbc682a3 653fa6dae5b87628 eeec43a18af59a9d"),
+  salt: hex("00f1000000000000000000000000000000000000000000000000000000000179"),
   // a and b are usually random. For testing, we force them to specific values.
   a: hex(`
     00f2000000000000 0000000000000000 0000000000000000 0000000000000000
@@ -81,10 +82,10 @@ const inputs_1: Input = {
 
 const expected_1: ExpectedOutput = {
   // 'k' encodes the group (N and g), used in SRP-6a
-  k: hex('05b9e8ef059c6b32 ea59fc1d322d37f0 4aa30bae5aa9003b 8321e21ddb04e300'),
+  k: hex("05b9e8ef059c6b32 ea59fc1d322d37f0 4aa30bae5aa9003b 8321e21ddb04e300"),
   // 'x' is derived from the salt and password
   // 'v' is the SRP verifier
-  x: hex('b5200337cc3f3f92 6cdddae0b2d31029 c069936a844aff58 779a545be89d0abe'),
+  x: hex("b5200337cc3f3f92 6cdddae0b2d31029 c069936a844aff58 779a545be89d0abe"),
   v: hex(`
     00173ffa0263e63c cfd6791b8ee2a40f 048ec94cd95aa8a3 125726f9805e0c82
     83c658dc0b607fbb 25db68e68e93f265 8483049c68af7e82 14c49fde2712a775
@@ -118,7 +119,7 @@ const expected_1: ExpectedOutput = {
     7374d73e79be2c39 75632de562c59647 0bb27bad79c3e2fc ddf194e1666cb9fc
   `),
   // 'u' combines the two public messages
-  u: hex('b284aa1064e87751 50da6b5e2147b47c a7df505bed94a6f4 bb2ad873332ad732'),
+  u: hex("b284aa1064e87751 50da6b5e2147b47c a7df505bed94a6f4 bb2ad873332ad732"),
   // 'S' is the shared secret
   S: hex(`
     0092aaf0f527906a a5e8601f5d707907 a03137e1b601e04b 5a1deb02a981f4be
@@ -131,15 +132,15 @@ const expected_1: ExpectedOutput = {
     6001497c27f362ed bafb25e0f045bfdf 9fb02db9c908f103 40a639fe84c31b27
   `),
   // 'K' is the shared derived key
-  K: hex('e68fd0112bfa31dc ffc8e9c96a1cbadb 4c3145978ff35c73 e5bf8d30bbc7499a'),
+  K: hex("e68fd0112bfa31dc ffc8e9c96a1cbadb 4c3145978ff35c73 e5bf8d30bbc7499a"),
   // 'M1' is the client's proof that it knows the shared key
-  M1: hex('27949ec1e0f16256 33436865edb037e2 3eb6bf5cb91873f2 a2729373c2039008')
+  M1: hex("27949ec1e0f16256 33436865edb037e2 3eb6bf5cb91873f2 a2729373c2039008"),
 };
 
 /* inputs_2/expected_2 have leading 0x00 bytes in 'x' and 'u' */
 const inputs_2: Input = {
   I: inputs_1.I, P: inputs_1.P,
-  salt: hex('00f1000000000000000000000000000000000000000000000000000000000021'),
+  salt: hex("00f1000000000000000000000000000000000000000000000000000000000021"),
   a: hex(`
     00f2000000000000 0000000000000000 0000000000000000 0000000000000000
     0000000000000000 0000000000000000 0000000000000000 0000000000000000
@@ -159,11 +160,11 @@ const inputs_2: Input = {
     0000000000000000 0000000000000000 0000000000000000 0000000000000000
     0000000000000000 0000000000000000 0000000000000000 0000000000000000
     0000000000000000 0000000000000000 0000000000000000 0000000000000001
-  `)
+  `),
 };
 const expected_2: ExpectedOutput = {
   k: expected_1.k,
-  x: hex('009b2740fb49284d 69cab7c916d449ee d7dcabf41332b8b8 d6928f529bd1a94e'),
+  x: hex("009b2740fb49284d 69cab7c916d449ee d7dcabf41332b8b8 d6928f529bd1a94e"),
   v: hex(`
     1cd8b856685672ee 7a5895d897121234 6c17c3472f2696e4 8cdeec5533c06693
     179bc24802b762bc c1e1f8fc8abe607a f2f44aac9172e7dd 0c0110e45cf3b700
@@ -197,7 +198,7 @@ const expected_2: ExpectedOutput = {
     cdcb555a6b16e844 5b03e09776eba841 7576dac458afbbd5 2902dfb0282bed79
   `),
   // 'u' combines the two public messages
-  u: hex('000e4039be3989ad 088dc17d8ade899a 6409e7e57b3e8518 cee1cbc77e1de243'),
+  u: hex("000e4039be3989ad 088dc17d8ade899a 6409e7e57b3e8518 cee1cbc77e1de243"),
   // 'S' is the shared secret
   S: hex(`
     5c7f591d134d19f9 fcedc2b4e3eecd3d 5deadfe7dd42bd59 b1c960516c65ab61
@@ -210,15 +211,15 @@ const expected_2: ExpectedOutput = {
     e75f0058f718ec14 f9bbeb29ff966e00 ddfdd2d38a1c7a68 ac455a57b972d528
   `),
   // 'K' is the shared derived key
-  K: hex('b637ede0b7a31c46 b2567e855eb8a7f7 a994937deee76479 62afbe35d6929709'),
+  K: hex("b637ede0b7a31c46 b2567e855eb8a7f7 a994937deee76479 62afbe35d6929709"),
   // 'M1' is the client's proof that it knows the shared key
-  M1: hex('67c83797eb1a3987 e2d48d287e3bd772 d25db2b3cd86ea22 c8cf3ae932a1e45b')
+  M1: hex("67c83797eb1a3987 e2d48d287e3bd772 d25db2b3cd86ea22 c8cf3ae932a1e45b"),
 };
 
 /* inputs_3/expected_3 have leading 0x00 bytes in 'x' and 'K' */
 const inputs_3: Input = {
   I: inputs_2.I, P: inputs_2.P,
-  salt: hex('00f1000000000000000000000000000000000000000000000000000000000021'),
+  salt: hex("00f1000000000000000000000000000000000000000000000000000000000021"),
   a: hex(`
     00f2000000000000 0000000000000000 0000000000000000 0000000000000000
     0000000000000000 0000000000000000 0000000000000000 0000000000000000
@@ -229,7 +230,7 @@ const inputs_3: Input = {
     0000000000000000 0000000000000000 0000000000000000 0000000000000000
     0000000000000000 0000000000000000 0000000000000000 00000000000001a0
   `),
-  b: inputs_2.b
+  b: inputs_2.b,
 };
 const expected_3: ExpectedOutput = {
   k: expected_2.k,
@@ -246,7 +247,7 @@ const expected_3: ExpectedOutput = {
     6c7011f3c979eaab 469f06465a5b7239 afaee535aedc5bd2 1a220546e0e6b70b
     5b6f54db3fea46d5 7ebc7fe46156d793 c59e6290d3cf9bc2 4316528da34f4640
   `),
-  u: hex('865d0efca6cf17d6 f489e129231f1a48 b20c83ec6581d11f 3a2fa48ea93cd305'),
+  u: hex("865d0efca6cf17d6 f489e129231f1a48 b20c83ec6581d11f 3a2fa48ea93cd305"),
   S: hex(`
     0ae26456e1a0dec1 ce162fb2e5bc7300 3c285e17c0b44f03 7ebbc57f8020ceae
     5d10a9e6e44eab2a 6915b582ab5f6e7d 16002ce05e524015 e9bc7c56d5131da4
@@ -257,14 +258,14 @@ const expected_3: ExpectedOutput = {
     249f7734081aa42d 58dd54f8f725b245 175cf7d102e1086c eba4cfe7e49a2d27
     ffd6aef7549d402f bfcea78b4f3398ac 9ab1ee199f70acb6 4d2a17e159ff500d
   `),
-  K: hex('00217598a4008956 4b17196bd43422d6 03a0a88a545b61b3 98c42c9cbcc1d1b3'),
-  M1: hex('96d815ecece1dff4 254cd77517b37b97 65e741c1a57169ab af538e867444ec7f')
+  K: hex("00217598a4008956 4b17196bd43422d6 03a0a88a545b61b3 98c42c9cbcc1d1b3"),
+  M1: hex("96d815ecece1dff4 254cd77517b37b97 65e741c1a57169ab af538e867444ec7f"),
 };
 
 /* inputs_4/expected_4 have leading 0x00 bytes in 'x' and 'M1' */
 const inputs_4: Input = {
   I: inputs_2.I, P: inputs_2.P,
-  salt: hex('00f1000000000000000000000000000000000000000000000000000000000021'),
+  salt: hex("00f1000000000000000000000000000000000000000000000000000000000021"),
   a: hex(`
     00f2000000000000 0000000000000000 0000000000000000 0000000000000000
     0000000000000000 0000000000000000 0000000000000000 0000000000000000
@@ -275,7 +276,7 @@ const inputs_4: Input = {
     0000000000000000 0000000000000000 0000000000000000 0000000000000000
     0000000000000000 0000000000000000 0000000000000000 0000000000000190
   `),
-  b: inputs_2.b
+  b: inputs_2.b,
 };
 const expected_4: ExpectedOutput = {
   k: expected_2.k,
@@ -292,7 +293,7 @@ const expected_4: ExpectedOutput = {
     c690f9478d5b331d c00eef68670edbf3 629fd1a6c85267d2 cbb90f1670e7ba09
     cf2b5a9b00be8e11 f33e47a1c1f04eca f35bccb61af1116e 4d0f9d475017bad2
   `),
-  u: hex('d0913eb75b61e15a 87756ffa04d4f967 e492bd0b330a2b11 fe8976aada2bb1ee'),
+  u: hex("d0913eb75b61e15a 87756ffa04d4f967 e492bd0b330a2b11 fe8976aada2bb1ee"),
   S: hex(`
     7ba3ce4a3d236b95 3c2d0fee42195c85 081664a44f55b82d a3abf66ac68bdbd7
     ad82d5ad95090782 5241fb706de8fc58 0a29e4579fbbedf3 0bec0138b3f76e06
@@ -303,30 +304,30 @@ const expected_4: ExpectedOutput = {
     d4a9bf0242bfe703 26fc19b68c90e83b 59b5cc21886ab602 f8bfa16fb50c3147
     9aad5e31698abf67 863b7ca6b6ac25a7 09a24d8f94c80bbf 691e38c81beb3c72
   `),
-  K: hex('bd2a167a93b8496e 68c7e24b37956924 672eb8249d25c281 13984912d5cf27a6'),
-  M1: hex('00cef66a047d506c bf941c236218e583 5343534ae08cf0cd 0fb7980bed242e05')
+  K: hex("bd2a167a93b8496e 68c7e24b37956924 672eb8249d25c281 13984912d5cf27a6"),
+  M1: hex("00cef66a047d506c bf941c236218e583 5343534ae08cf0cd 0fb7980bed242e05"),
 };
 
-function hexequal(a: Buffer, b: Buffer, msg?: string) {
-  assert.equal(a.length, b.length, msg);
-  assert.equal(a.toString('hex'), b.toString('hex'), msg);
+function hexequal(a: Buffer, b: Buffer, msg?: string): void {
+  assert.strictEqual(a.length, b.length, msg);
+  assert.strictEqual(a.toString("hex"), b.toString("hex"), msg);
 }
 
-function numequal(a: BigInteger, b: BigInteger, msg?: string) {
+function numequal(a: BigInteger, b: BigInteger, msg?: string): void {
   assert(a.compareTo(b) === 0, msg);
 }
 
-function checkVectors(params: SrpParams, inputs: Input, expected: ExpectedOutput) {
-  hexequal(inputs.I, Buffer.from('616e6472c3a9406578616d706c652e6f7267', 'hex'), 'I');
-  hexequal(SRP.computeVerifier(params, inputs.salt, inputs.I, inputs.P), expected.v, 'v');
+function checkVectors(params: SrpParams, inputs: Input, expected: ExpectedOutput): void {
+  hexequal(inputs.I, Buffer.from("616e6472c3a9406578616d706c652e6f7267", "hex"), "I");
+  hexequal(SRP.computeVerifier(params, inputs.salt, inputs.I, inputs.P), expected.v, "v");
 
   const client = new SrpClient(params, inputs.salt, inputs.I, inputs.P, inputs.a, false);
   const server = new SrpServer(params, expected.v, inputs.b);
 
   // @ts-ignore
-  numequal(client._k, new BigInteger(expected.k.toString('hex'), 16), 'k');
+  numequal(client._k, new BigInteger(expected.k.toString("hex"), 16), "k");
   // @ts-ignore
-  numequal(client._x, new BigInteger(expected.x.toString('hex'), 16), 'x');
+  numequal(client._x, new BigInteger(expected.x.toString("hex"), 16), "x");
   hexequal(client.computeA(), expected.A);
   hexequal(server.computeB(), expected.B);
 
@@ -338,7 +339,7 @@ function checkVectors(params: SrpParams, inputs: Input, expected: ExpectedOutput
   client.setB(expected.B);
 
   // @ts-ignore
-  numequal(client._u, new BigInteger(expected.u.toString('hex'), 16));
+  numequal(client._u, new BigInteger(expected.u.toString("hex"), 16));
   // @ts-ignore
   hexequal(client._S, expected.S);
   hexequal(client.computeM1(), expected.M1);
@@ -346,17 +347,17 @@ function checkVectors(params: SrpParams, inputs: Input, expected: ExpectedOutput
 
   server.setA(expected.A);
   // @ts-ignore
-  numequal(server._u, new BigInteger(expected.u.toString('hex'), 16));
+  numequal(server._u, new BigInteger(expected.u.toString("hex"), 16));
   // @ts-ignore
   hexequal(server._S, expected.S);
-  assert.throws(() => server.checkM1(Buffer.from('notM1')), /client did not use the same password/);
+  assert.throws(() => server.checkM1(Buffer.from("notM1")), /client did not use the same password/);
   server.checkM1(expected.M1); // happy, not throwy
   hexequal(server.computeK(), expected.K);
 }
 
-vows.describe('picl vectors').addBatch({
-  'vectors 1': () => checkVectors(params, inputs_1, expected_1),
-  'vectors 2': () => checkVectors(params, inputs_2, expected_2),
-  'vectors 3': () => checkVectors(params, inputs_3, expected_3),
-  'vectors 4': () => checkVectors(params, inputs_4, expected_4),
+vows.describe("picl vectors").addBatch({
+  "vectors 1": () => checkVectors(params, inputs_1, expected_1),
+  "vectors 2": () => checkVectors(params, inputs_2, expected_2),
+  "vectors 3": () => checkVectors(params, inputs_3, expected_3),
+  "vectors 4": () => checkVectors(params, inputs_4, expected_4),
 }).export(module);

@@ -1,4 +1,4 @@
-import {hex} from '../params';
+import { hex } from "../params";
 
 // Modulus (N), as specified by the 3072-bit group of RFC 5054
 export const N = hex(`
@@ -17,13 +17,13 @@ export const N = hex(`
 `);
 
 // Generator (g), as specified by the 3072-bit group of RFC 5054
-export const g = hex('05');
+export const g = hex("05");
 
 // Username (I), as an ASCII string without quotes
-export const I = 'alice';
+export const I = "alice";
 
 // Password (p), as an ASCII string without quotes
-export const p = 'password123';
+export const p = "password123";
 
 // A private (a)
 export const a = hex(`

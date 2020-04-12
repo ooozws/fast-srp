@@ -1,4 +1,4 @@
-fast-srp
+fast-srp-hap
 ===
 
 Is a pure [NodeJS](https://nodejs.org/) implementation of the [SRP6a protocol](http://srp.stanford.edu/).
