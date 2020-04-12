@@ -1,10 +1,2 @@
-# IntelliJ project files
-.idea
-*.iml
-
 node_modules
-npm-debug.log
-.node-version
-
-.DS_Store
-
+dist
