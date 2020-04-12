@@ -1,6 +1,10 @@
 fast-srp-hap
 ===
 
+![NPM-Version](https://badgen.net/npm/v/fast-srp-hap)
+![NPM-Downloads](https://badgen.net/npm/dt/fast-srp-hap)
+![Node-CI](https://github.com/homebridge/fast-srp/workflows/Node-CI/badge.svg)
+
 Is a pure [NodeJS](https://nodejs.org/) implementation of the [SRP6a protocol](http://srp.stanford.edu/).
 
 It's a derived work of [Jed Parson](http://jedparsons.com/)'s [node-srp](https://github.com/jedp/node-srp) and [Tom Wu](http://www-cs-students.stanford.edu/~tjw/)'s [jsbn](http://www-cs-students.stanford.edu/~tjw/jsbn/).
