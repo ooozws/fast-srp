@@ -97,6 +97,7 @@ function checkVectors(params: SrpParams, inputs: Input, expected: ExpectedOutput
   assert.throws(() => client.computeK(), /incomplete protocol/);
   assert.throws(() => server.checkM1(expected.M1), /incomplete protocol/);
   assert.throws(() => server.computeK(), /incomplete protocol/);
+  assert.throws(() => server.computeM2(), /incomplete protocol/);
 
   client.setB(expected.B);
 
