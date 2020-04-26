@@ -23,22 +23,32 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Run npm install
-        run: npm ci
+      - name: npm install, build and test
+        run: |
+          npm ci
+          npm run build
+          npm run lint
+          npm run test-coverage
         env:
           CI: true
-      - name: Run build
-        run: npm run build
-        env:
-          CI: true
-      - name: Run lint
-        run: npm run lint
-        env:
-          CI: true
-      - name: Run test
-        run: npm test
-        env:
-          CI: true
+      - name: Coveralls Parallel
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          flag-name: run-${{ matrix.node-version }}
+          parallel: true
+
+  finish:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          parallel-finished: true
 
   publish-npm:
     # publish only if we are on our own repo, event was 'create' (a tag was created) and the tag starts with "v" (aka version tag)

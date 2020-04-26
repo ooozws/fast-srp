@@ -5,10 +5,11 @@
   "main": "lib/srp.js",
   "types": "lib/srp.d.ts",
   "scripts": {
-    "clean": "rm -rf lib",
+    "clean": "rimraf lib && rimraf coverage && rimraf .nyc_output",
     "lint": "eslint 'src/**/*.{js,ts,json}'",
     "build": "npm run clean && tsc",
     "test": "vows lib/test/test_*.js --spec",
+    "test-coverage": "nyc --reporter=lcovonly npm run test",
     "docs": "typedoc src/srp.ts",
     "prepublishOnly": "npm run build",
     "postpublish": "npm run clean"
@@ -34,9 +35,11 @@
     "@types/node": "^10.17.19",
     "typescript": "^3.8.3",
     "vows": "^0.8.3",
+    "nyc": "^15.0.1",
     "typedoc": "next",
     "eslint": "^6.8.0",
     "@typescript-eslint/parser": "^2.27.0",
-    "@typescript-eslint/eslint-plugin": "^2.27.0"
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "rimraf": "^3.0.2"
   }
 }
