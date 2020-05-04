@@ -10,7 +10,7 @@ Is a pure [NodeJS](https://nodejs.org/) implementation of the [SRP6a protocol](h
 
 It's a derived work of [Jed Parson](http://jedparsons.com/)'s [node-srp](https://github.com/jedp/node-srp) and [Tom Wu](http://www-cs-students.stanford.edu/~tjw/)'s [jsbn](http://www-cs-students.stanford.edu/~tjw/jsbn/).
 
-Full documentation can be found [here](https://homebridge.github.io/fast-srp/globals.html).
+Full documentation can be found [here](https://developers.homebridge.io/fast-srp/globals.html).
 
 Creating the Verifier
 ---
