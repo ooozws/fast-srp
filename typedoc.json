@@ -1,11 +1,9 @@
 {
-  "mode": "library",
   "out": "docs",
   "includes": "src",
   "exclude": ["src/test/**/*"],
 
   "excludePrivate": true,
   "excludeProtected": true,
-  "excludeNotExported": true,
   "hideGenerator": true
 }
