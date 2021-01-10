@@ -100,7 +100,6 @@ export class SRP {
     assertIsBuffer(salt, "salt (salt)");
     assertIsBuffer(I, "identity (I)");
     assertIsBuffer(P, "password (P)");
-    // eslint-disable-next-line @typescript-eslint/camelcase
     const v_num = params.g.modPow(getx(params, salt, I, P), params.N);
     return v_num.toBuffer(params.N_length_bits / 8);
   }

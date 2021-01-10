@@ -27,6 +27,6 @@
     "brace-style": ["error"],
 
     "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/camelcase": "off"
+    "@typescript-eslint/naming-convention": "off"
   }
 }
