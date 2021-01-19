@@ -7,7 +7,7 @@ export { SrpParams } from "./params";
 
 const zero = new BigInteger(0, 10);
 
-function assert_<V>(val: V, msg: string): void{
+function assert_<V>(val: V, msg: string): void {
   if (!val) {
     throw new Error(msg || "assertion");
   }
@@ -291,8 +291,8 @@ function getK(params: SrpParams, S_buf: Buffer): Buffer {
   if (params.hash === "sha1") {
     // use t_mgf1 interleave for short sha1 hashes
     return Buffer.concat([
-      crypto.createHash(params.hash).update(S_buf).update(Buffer.from([0,0,0,0])).digest(),
-      crypto.createHash(params.hash).update(S_buf).update(Buffer.from([0,0,0,1])).digest(),
+      crypto.createHash(params.hash).update(S_buf).update(Buffer.from([0, 0, 0, 0])).digest(),
+      crypto.createHash(params.hash).update(S_buf).update(Buffer.from([0, 0, 0, 1])).digest(),
     ]);
   } else {
     // use hash as-is otherwise
@@ -317,7 +317,7 @@ function getM1(params: SrpParams, u_buf: Buffer, s_buf: Buffer, A_buf: Buffer, B
  * @param {Buffer} B_buf Server public key
  * @param {Buffer} K_buf Shared session key
  */
-function getM1(params: SrpParams,                               A_buf: Buffer, B_buf: Buffer, K_buf: Buffer): Buffer
+function getM1(params: SrpParams, A_buf: Buffer, B_buf: Buffer, K_buf: Buffer): Buffer
 function getM1(params: SrpParams, u_buf: Buffer, s_buf: Buffer, A_buf: Buffer, B_buf?: Buffer, K_buf?: Buffer): Buffer {
   if (arguments.length > 4) {
     assertIsBuffer(u_buf, "identity (I)");
@@ -405,11 +405,7 @@ export class SrpClient {
    * @param {Buffer} secret1_buf Client private key {@see genKey}
    * @param {boolean} hap
    */
-  constructor(params: SrpParams, precomputed_x?: Buffer, salt_buf?: Buffer, identity_buf: Buffer, password_buf?: Buffer, secret1_buf: Buffer, hap = true) {
-    assertIsBuffer(salt_buf, "salt (s)");
-    assertIsBuffer(identity_buf, "identity (I)");
-    assertIsBuffer(password_buf, "password (P)");
-    assertIsBuffer(secret1_buf, "secret1");
+  constructor(params: SrpParams, identity_buf: Buffer, precomputed_x?: Buffer, salt_buf?: Buffer, password_buf?: Buffer, secret1_buf: Buffer, hap = true) {
 
     this._params = params;
     this._k = getk(params);
@@ -418,7 +414,7 @@ export class SrpClient {
     } else if (salt_buf != undefined && password_buf != undefined) {
       this._x = getx(params, salt_buf, identity_buf, password_buf);
     }
-    
+
     this._a = new BigInteger(secret1_buf);
 
     if (hap) {
@@ -502,8 +498,8 @@ export interface BaseIdentity {
   salt: Buffer;
 }
 
-export type PasswordIdentity = BaseIdentity & {password: Buffer | string};
-export type VerifierIdentity = BaseIdentity & {verifier: Buffer};
+export type PasswordIdentity = BaseIdentity & { password: Buffer | string };
+export type VerifierIdentity = BaseIdentity & { verifier: Buffer };
 
 export type Identity = PasswordIdentity | VerifierIdentity;
 
