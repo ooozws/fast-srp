@@ -405,7 +405,7 @@ export class SrpClient {
    * @param {Buffer} secret1_buf Client private key {@see genKey}
    * @param {boolean} hap
    */
-  constructor(params: SrpParams, salt_buf: Buffer, identity_buf: Buffer, password_buf: Buffer, secret1_buf: Buffer, hap = true) {
+  constructor(params: SrpParams, precomputed_x?: Buffer, salt_buf?: Buffer, identity_buf: Buffer, password_buf?: Buffer, secret1_buf: Buffer, hap = true) {
     assertIsBuffer(salt_buf, "salt (s)");
     assertIsBuffer(identity_buf, "identity (I)");
     assertIsBuffer(password_buf, "password (P)");
@@ -413,40 +413,17 @@ export class SrpClient {
 
     this._params = params;
     this._k = getk(params);
-    this._x = getx(params, salt_buf, identity_buf, password_buf);
+    if (precomputed_x != undefined) {
+      this._x = precomputed_x;
+    } else if (salt_buf != undefined && password_buf != undefined) {
+      this._x = getx(params, salt_buf, identity_buf, password_buf);
+    }
+    
     this._a = new BigInteger(secret1_buf);
 
     if (hap) {
       this._I = identity_buf;
       this._s = salt_buf;
-    }
-
-    this._A = getA(params, this._a);
-  }
-
-  /**
-   * Create an SRP client.
-   *
-   * @param {object} params Group parameters, with .N, .g, .hash
-   * @param {Buffer} salt_buf User salt (from server)
-   * @param {Buffer} identity_buf Identity/username
-   * @param {Buffer} password_buf Password
-   * @param {Buffer} secret1_buf Client private key {@see genKey}
-   * @param {boolean} hap
-   */
-  constructor(params: SrpParams, identity_buf: Buffer, precomputed_x: Buffer, secret1_buf: Buffer, hap = true) {
-    assertIsBuffer(salt_buf, "salt (s)");
-    assertIsBuffer(identity_buf, "identity (I)");
-    assertIsBuffer(password_buf, "password (P)");
-    assertIsBuffer(secret1_buf, "secret1");
-
-    this._params = params;
-    this._k = getk(params);
-    this._x = precomputed_x;
-    this._a = new BigInteger(secret1_buf);
-
-    if (hap) {
-      this._I = identity_buf;
     }
 
     this._A = getA(params, this._a);
