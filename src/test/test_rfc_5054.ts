@@ -63,7 +63,7 @@ vows.describe("RFC 5054").addBatch({
     },
 
     "x"(): void {
-      const client = new SrpClient(params, s, I, P, a, false);
+      const client = new SrpClient(params, I, a, undefined, s, P, false);
       // @ts-ignore
       assert.strictEqual(asHex(client._x), x_expected);
     },
@@ -73,13 +73,13 @@ vows.describe("RFC 5054").addBatch({
     },
 
     "k"(): void {
-      const client = new SrpClient(params, s, I, P, a, false);
+      const client = new SrpClient(params, I, a, undefined, s, P, false);;
       // @ts-ignore
       assert.strictEqual(asHex(client._k), k_expected);
     },
 
     "A"(): void {
-      const client = new SrpClient(params, s, I, P, a, false);
+      const client = new SrpClient(params, I, a, undefined, s, P, false);;
       assert.strictEqual(client.computeA().toString("hex"), A_expected);
     },
 
@@ -89,14 +89,14 @@ vows.describe("RFC 5054").addBatch({
     },
 
     "u"(): void {
-      const client = new SrpClient(params, s, I, P, a, false);
+      const client = new SrpClient(params, I, a, undefined, s, P, false);;
       client.setB(Buffer.from(B_expected, "hex"));
       // @ts-ignore
       assert.strictEqual(asHex(client._u), u_expected);
     },
 
     "S client"(): void {
-      const client = new SrpClient(params, s, I, P, a, false);
+      const client = new SrpClient(params, I, a, undefined, s, P, false);;
       client.setB(Buffer.from(B_expected, "hex"));
       // @ts-ignore
       assert.strictEqual(client._S.toString("hex"), S_expected);

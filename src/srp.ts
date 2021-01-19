@@ -2,6 +2,7 @@ import crypto from "crypto";
 import assert from "assert";
 import BigInteger = require("../jsbn/jsbn");
 import { SrpParams, params as srpParams } from "./params";
+import { X_OK } from "constants";
 
 export { SrpParams } from "./params";
 
@@ -405,15 +406,17 @@ export class SrpClient {
    * @param {Buffer} secret1_buf Client private key {@see genKey}
    * @param {boolean} hap
    */
-  constructor(params: SrpParams, identity_buf: Buffer, precomputed_x?: Buffer, salt_buf?: Buffer, password_buf?: Buffer, secret1_buf: Buffer, hap = true) {
+  constructor(params: SrpParams, identity_buf: Buffer, secret1_buf: Buffer, precomputed_x?: Buffer, salt_buf?: Buffer, password_buf?: Buffer, hap = true) {
 
     this._params = params;
     this._k = getk(params);
+    var x: BigInteger = new BigInteger(0);
     if (precomputed_x != undefined) {
-      this._x = new BigInteger(precomputed_x);
+      x = new BigInteger(precomputed_x);
     } else if (salt_buf != undefined && password_buf != undefined) {
-      this._x = getx(params, salt_buf, identity_buf, password_buf);
+      x = getx(params, salt_buf, identity_buf, password_buf);
     }
+    this._x = x;
 
     this._a = new BigInteger(secret1_buf);
 

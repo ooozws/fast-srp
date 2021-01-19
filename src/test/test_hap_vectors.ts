@@ -34,7 +34,7 @@ interface ExpectedOutput {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {N, g, I, p, a, A, b, B, s, v, u, S, K} from "./hap_test_data";
+import { N, g, I, p, a, A, b, B, s, v, u, S, K } from "./hap_test_data";
 
 const params = SRP.params.hap;
 
@@ -81,9 +81,9 @@ function checkVectors(params: SrpParams, inputs: Input, expected: ExpectedOutput
   hexequal(inputs.I, Buffer.from("616c696365", "hex"), "I");
   hexequal(SRP.computeVerifier(params, inputs.salt, inputs.I, inputs.P), expected.v, "v");
 
-  const client = new SrpClient(params, inputs.salt, inputs.I, inputs.P, inputs.a, true);
+  const client = new SrpClient(params, inputs.I, inputs.a, undefined, inputs.salt, inputs.P, true);
   const server = useVerifier ?
-    new SrpServer(params, {username: inputs.I, salt: inputs.salt, verifier: expected.v}, inputs.b) :
+    new SrpServer(params, { username: inputs.I, salt: inputs.salt, verifier: expected.v }, inputs.b) :
     new SrpServer(params, inputs.salt, inputs.I, inputs.P, inputs.b);
 
   // @ts-ignore

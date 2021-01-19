@@ -321,7 +321,7 @@ function checkVectors(params: SrpParams, inputs: Input, expected: ExpectedOutput
   hexequal(inputs.I, Buffer.from("616e6472c3a9406578616d706c652e6f7267", "hex"), "I");
   hexequal(SRP.computeVerifier(params, inputs.salt, inputs.I, inputs.P), expected.v, "v");
 
-  const client = new SrpClient(params, inputs.salt, inputs.I, inputs.P, inputs.a, false);
+  const client = new SrpClient(params, inputs.I, inputs.a, undefined, inputs.salt, inputs.P, false);
   const server = new SrpServer(params, expected.v, inputs.b);
 
   // @ts-ignore
