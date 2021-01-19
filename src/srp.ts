@@ -414,7 +414,7 @@ export class SrpClient {
     this._params = params;
     this._k = getk(params);
     if (precomputed_x != undefined) {
-      this._x = precomputed_x;
+      this._x = new BigInteger(precomputed_x);
     } else if (salt_buf != undefined && password_buf != undefined) {
       this._x = getx(params, salt_buf, identity_buf, password_buf);
     }
