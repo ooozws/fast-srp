@@ -425,6 +425,34 @@ export class SrpClient {
   }
 
   /**
+   * Create an SRP client.
+   *
+   * @param {object} params Group parameters, with .N, .g, .hash
+   * @param {Buffer} salt_buf User salt (from server)
+   * @param {Buffer} identity_buf Identity/username
+   * @param {Buffer} password_buf Password
+   * @param {Buffer} secret1_buf Client private key {@see genKey}
+   * @param {boolean} hap
+   */
+  constructor(params: SrpParams, identity_buf: Buffer, precomputed_x: Buffer, secret1_buf: Buffer, hap = true) {
+    assertIsBuffer(salt_buf, "salt (s)");
+    assertIsBuffer(identity_buf, "identity (I)");
+    assertIsBuffer(password_buf, "password (P)");
+    assertIsBuffer(secret1_buf, "secret1");
+
+    this._params = params;
+    this._k = getk(params);
+    this._x = precomputed_x;
+    this._a = new BigInteger(secret1_buf);
+
+    if (hap) {
+      this._I = identity_buf;
+    }
+
+    this._A = getA(params, this._a);
+  }
+
+  /**
    * Returns the client's public key (A).
    *
    * @return {Buffer}
